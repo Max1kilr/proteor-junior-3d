@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Proteor Junior en 3D</title>
+<meta name="description" content="La prothèse de jambe qui grandit avec l’enfant : vue 3D, vue éclatée et simulation de croissance. Projet du groupe 51, Arts et Métiers.">
+<meta name="theme-color" content="#173B6C">
+<style>
+:root{
+  --navy:#173B6C;--gold:#FFB000;--ink:#16202A;--muted:#5B6672;--line:#D5DBDA;--bg:#F2EEE6;--card:#FFFFFF;
+  --blue:#235CA5;--green:#1E7F68;--orange:#C2410C;--red:#B83B32;
+  --t-blue:#E6EEF8;--t-green:#DCEFE9;--t-or:#FCEADF;--wash:#F3F5F7;
+  --metal:#8C96A0;--carbon:#2A3138;--socket:#B9B2A6;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Calibri,Arial,sans-serif;-webkit-text-size-adjust:100%}
+header{background:var(--navy);color:#fff;padding:16px 16px 14px}
+header .in{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+header h1{margin:0;font-size:clamp(26px,6vw,40px);line-height:1.05;letter-spacing:-.01em}
+header p{margin:4px 0 0;color:var(--gold);font-weight:700;font-size:clamp(15px,3.6vw,19px)}
+header .grp{font-size:13px;opacity:.85;text-align:right;white-space:nowrap}
+main{max-width:1100px;margin:0 auto;padding:14px 16px 28px;display:grid;gap:14px}
+@media(min-width:900px){main{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);align-items:start}}
+.stage{position:relative;background:radial-gradient(120% 90% at 50% 30%,#fff 0,#EEF1F4 70%);border:2px solid var(--blue);border-radius:16px;overflow:hidden;height:min(64vh,620px);min-height:380px;touch-action:none}
+.stage canvas{display:block;width:100%;height:100%}
+.tools{position:absolute;left:10px;right:10px;top:10px;display:flex;gap:8px;flex-wrap:wrap;z-index:3}
+.btn{appearance:none;border:0;border-radius:999px;padding:10px 16px;font:700 15px/1 inherit;font-family:inherit;cursor:pointer;background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.btn.main{background:var(--navy);color:#fff}
+.btn[aria-pressed="true"]{background:var(--gold);color:var(--navy)}
+.hint{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:13px;color:var(--muted);pointer-events:none}
+.tag3d{position:absolute;transform:translate(8px,-50%);background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:4px 10px;font-size:13px;font-weight:700;white-space:nowrap;pointer-events:none;z-index:2;transition:opacity .2s}
+.tag3d.new{border-color:var(--gold);background:var(--gold);color:var(--navy)}
+.fallback{position:absolute;inset:60px 16px auto;background:#fff;border-radius:12px;padding:14px;font-size:15px}
+.panel{display:grid;gap:12px}
+.card{background:var(--card);border-radius:14px;padding:14px 16px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.card h2{margin:0 0 6px;font-size:18px;color:var(--navy)}
+.grow label{display:flex;justify-content:space-between;font-weight:700;font-size:15px;margin-bottom:6px}
+.grow output{color:var(--green)}
+input[type=range]{width:100%;accent-color:var(--green);height:32px}
+.meter{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.meter div{background:var(--wash);border-radius:10px;padding:8px;text-align:center}
+.meter b{display:block;font-size:20px;color:var(--navy)}
+.meter span{font-size:12px;color:var(--muted)}
+.msg{margin:10px 0 0;font-size:14px;color:var(--muted);min-height:2.6em}
+.msg b{color:var(--green)}
+.parts{display:grid;gap:8px}
+.part{all:unset;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;background:var(--card);border-radius:12px;padding:12px;cursor:pointer;border:2px solid transparent;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.part[aria-pressed="true"]{border-color:var(--blue)}
+.part .k{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:800}
+.part strong{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:16px}
+.pill{font-size:12px;font-weight:800;border-radius:999px;padding:3px 8px}
+.pill.new{background:var(--gold);color:var(--navy)}.pill.cat{background:var(--t-green);color:var(--green)}.pill.out{background:var(--wash);color:var(--muted)}
+.part .s{display:block;font-size:14px;color:var(--muted);margin-top:3px}
+.part .d{display:block;font-size:14px;margin-top:6px;line-height:1.4}
+.loop{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;font-weight:700}
+.loop span{background:var(--t-green);color:var(--green);border-radius:999px;padding:6px 10px}
+.loop i{font-style:normal;color:var(--green)}
+footer{max-width:1100px;margin:0 auto;padding:0 16px 30px;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <div><h1>Proteor Junior</h1><p>La prothèse de jambe qui grandit avec l’enfant</p></div>
+  <div class="grp">Groupe 51<br>Arts et Métiers</div>
+</div></header>
+
+<main>
+  <section class="stage" id="stage" aria-label="Prothèse en 3D">
+    <div class="tools">
+      <button class="btn main" id="explodeBtn" type="button">Éclater</button>
+      <button class="btn" id="growBtn" type="button">Faire grandir</button>
+      <button class="btn" id="spin" type="button" aria-pressed="true">Rotation</button>
+    </div>
+    <div class="hint">Glisser pour tourner · pincer pour zoomer · toucher une pièce</div>
+  </section>
+
+  <div class="panel">
+    <div class="card grow">
+      <label for="growth">Croissance de la jambe <output id="growthOut">+0 cm</output></label>
+      <input type="range" id="growth" min="0" max="2000" value="0" aria-describedby="growMsg">
+      <div class="meter">
+        <div><b id="mTube">10 cm</b><span>tube en place</span></div>
+        <div><b id="mReg">0 cm</b><span>réglage (max 5 cm)</span></div>
+        <div><b id="mBack">0</b><span>tubes rendus</span></div>
+      </div>
+      <p class="msg" id="growMsg">La pièce de réglage s’allonge avec l’enfant. Le tube n’est changé que tous les <b>≈ 3 ans</b>, au lieu de chaque année.</p>
+    </div>
+    <div class="parts" id="parts"></div>
+    <div class="card">
+      <h2>Une pièce, plusieurs enfants</h2>
+      <div class="loop"><span>Fabrication</span><i>→</i><span>Pose en cabinet</span><i>→</i><span>L’enfant grandit</span><i>→</i><span>Reprise, contrôle</span><i>→</i><span>Un autre enfant</span></div>
+      <p class="msg" style="min-height:0">Un même tube peut servir ≈ 10 enfants (hypothèse du groupe, à valider par essais de fatigue).</p>
+    </div>
+  </div>
+</main>
+<footer>Projet collectif « Entreprise santé durable », tronc commun 3A, Arts et Métiers · Groupe 51 : Camille, Maxime, Oscar, Théophile. Modèle 3D simplifié, à visée illustrative ; durées et longueurs : hypothèses du groupe.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const PARTS=[
+ {id:"socket",n:"1",name:"Emboîture",tag:"out",tagl:"Orthoprothésiste",s:"Sur mesure, moulée sur le moignon",
+  d:"Faite en cabinet par l’orthoprothésiste à partir du moignon de l’enfant. Elle reste hors du périmètre de l’usine."},
+ {id:"reg",n:"2",name:"Pièce de réglage",tag:"new",tagl:"Pièce nouvelle",s:"+5 cm avec l’enfant",
+  d:"La seule pièce que l’on crée. Elle s’allonge jusqu’à 5 cm puis se bloque par une bague de serrage. L’enfant la garde pendant toute sa croissance."},
+ {id:"tube",n:"3",name:"Tube normé",tag:"cat",tagl:"Catalogue Proteor",s:"Changé tous les ≈ 3 ans, au lieu de 12 mois",
+  d:"4 longueurs fixes (10, 15, 20 et 25 cm), jamais recoupé. Quand le réglage est au maximum, on passe au tube suivant ; l’ancien est contrôlé puis donné à un autre enfant."},
+ {id:"foot",n:"4",name:"Pied",tag:"cat",tagl:"Catalogue Proteor",s:"Changé quand l’enfant grandit",
+  d:"Pied du catalogue Proteor, reconditionné entre deux enfants."}
+];
+const partsEl=$("#parts");
+PARTS.forEach(p=>{
+  const b=document.createElement("button");b.className="part";b.type="button";b.dataset.id=p.id;b.setAttribute("aria-pressed","false");
+  b.innerHTML=`<span class="k">${p.n}</span><span><strong>${p.name}<span class="pill ${p.tag}">${p.tagl}</span></strong><span class="s">${p.s}</span><span class="d" hidden>${p.d}</span></span>`;
+  b.onclick=()=>P3.select(P3.sel===p.id?null:p.id);
+  partsEl.appendChild(b);
+});
+
+const P3=(()=>{
+  let inited=false,renderer,scene,camera,root,groups={},mats={},tags={};
+  let explode=0,explodeTarget=0,growth=0,growthTarget=0,spin=true,rotY=0.6,rotX=0.12,zf=1,fitDist=80,dist=80,sel=null,dragging=false,lastX=0,lastY=0,moved=0,pinch=0;
+  const stage=$("#stage"),pointers=new Map();
+  const api={get sel(){return sel}};
+  const col=n=>new THREE.Color(css(n)||"#888");
+  const lathe=(pr,m,seg=48)=>new THREE.Mesh(new THREE.LatheGeometry(pr.map(([r,y])=>new THREE.Vector2(r,y)),seg),m);
+  function build(){
+    scene=new THREE.Scene();
+    camera=new THREE.PerspectiveCamera(32,1,1,800);
+    renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+    renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+    stage.prepend(renderer.domElement);
+    scene.add(new THREE.HemisphereLight(0xffffff,0x445566,0.6));
+    const d1=new THREE.DirectionalLight(0xffffff,0.7);d1.position.set(30,60,40);scene.add(d1);
+    const d2=new THREE.DirectionalLight(0xffffff,0.35);d2.position.set(-40,20,-30);scene.add(d2);
+    mats.metal=new THREE.MeshStandardMaterial({color:col("--metal"),metalness:.35,roughness:.35});
+    mats.carbon=new THREE.MeshStandardMaterial({color:col("--carbon"),metalness:.15,roughness:.55});
+    mats.socket=new THREE.MeshStandardMaterial({color:col("--socket"),metalness:0,roughness:.6,transparent:true,opacity:.93,side:THREE.DoubleSide});
+    mats.liner=new THREE.MeshStandardMaterial({color:col("--wash"),metalness:0,roughness:.9,side:THREE.DoubleSide});
+    mats.reg=new THREE.MeshStandardMaterial({color:col("--blue"),metalness:.1,roughness:.4});
+    mats.regDark=new THREE.MeshStandardMaterial({color:col("--ink"),metalness:.3,roughness:.4});
+    mats.ghost=new THREE.MeshStandardMaterial({color:col("--muted"),transparent:true,opacity:.14,depthWrite:false,roughness:.8});
+    root=new THREE.Group();scene.add(root);
+    // pied
+    const s=new THREE.Shape();
+    s.moveTo(-4.2,0);s.lineTo(11.5,0);s.quadraticCurveTo(13.4,0.1,13.2,1.2);s.quadraticCurveTo(12.6,2.0,9.5,2.2);
+    s.quadraticCurveTo(4.5,2.7,1.8,4.4);s.lineTo(1.2,5.6);s.lineTo(-1.6,5.6);s.lineTo(-2.2,4.0);
+    s.quadraticCurveTo(-4.6,3.4,-4.9,1.6);s.quadraticCurveTo(-5.0,0.2,-4.2,0);
+    const fg=new THREE.ExtrudeGeometry(s,{depth:5.2,bevelEnabled:true,bevelThickness:.5,bevelSize:.45,bevelSegments:3,curveSegments:14});
+    fg.translate(0,0,-2.6);fg.rotateY(-Math.PI/2);
+    const foot=new THREE.Group();foot.add(new THREE.Mesh(fg,mats.carbon));
+    const fa=lathe([[0,0],[1.7,0],[1.7,.7],[1.1,.9],[0,.9]],mats.metal);fa.position.set(0,5.6,0.1);foot.add(fa);
+    const pyr=new THREE.Mesh(new THREE.CylinderGeometry(.55,1.05,.8,4),mats.metal);pyr.rotation.y=Math.PI/4;pyr.position.set(0,6.9,0.1);foot.add(pyr);
+    groups.foot=foot;
+    // tube
+    const tube=new THREE.Group();
+    const tm=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.5,1,40),mats.metal);tm.position.y=.5;tube.add(tm);
+    const tc1=lathe([[0,0],[1.95,0],[1.95,1.4],[1.5,1.6],[0,1.6]],mats.metal);tube.add(tc1);
+    const band=new THREE.Mesh(new THREE.CylinderGeometry(1.53,1.53,.35,40),mats.regDark);tube.add(band);
+    Object.assign(tube.userData,{tm,tc1,band});groups.tube=tube;
+    // réglage
+    const reg=new THREE.Group();
+    reg.add(lathe([[0,0],[2.25,0],[2.25,3.6],[2.0,3.9],[0,3.9]],mats.reg));
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(2.3,.32,12,40),mats.regDark);ring.rotation.x=Math.PI/2;ring.position.y=3.3;reg.add(ring);
+    const screw=new THREE.Mesh(new THREE.CylinderGeometry(.35,.35,1.6,16),mats.regDark);screw.rotation.z=Math.PI/2;screw.position.set(2.6,3.3,0);reg.add(screw);
+    const inner=new THREE.Mesh(new THREE.CylinderGeometry(1.75,1.75,1,40),mats.metal);reg.add(inner);
+    const top=lathe([[0,0],[2.1,0],[2.1,.8],[1.2,1.1],[0,1.1]],mats.reg);reg.add(top);
+    const pyr2=new THREE.Mesh(new THREE.CylinderGeometry(.55,1.05,.8,4),mats.regDark);pyr2.rotation.y=Math.PI/4;reg.add(pyr2);
+    Object.assign(reg.userData,{inner,top,pyr:pyr2});groups.reg=reg;
+    // emboîture
+    const sock=new THREE.Group();
+    sock.add(lathe([[0,0],[2.4,0],[2.9,1.2],[4.1,6],[5.0,12],[5.4,16],[5.5,17]],mats.socket));
+    sock.add(lathe([[0,1.0],[2.4,1.4],[3.6,6],[4.5,12],[4.9,16],[4.95,17]],mats.liner));
+    const rim=new THREE.Mesh(new THREE.TorusGeometry(5.22,.3,10,48),mats.socket);rim.rotation.x=Math.PI/2;rim.position.y=17;sock.add(rim);
+    sock.add(lathe([[0,-1.3],[2.2,-1.3],[2.2,0],[0,0]],mats.metal));
+    groups.socket=sock;
+    Object.entries(groups).forEach(([k,g])=>{g.traverse(o=>{if(o.isMesh)o.userData.part=k});root.add(g)});
+    PARTS.forEach(p=>{const t=document.createElement("div");t.className="tag3d"+(p.id==="reg"?" new":"");t.textContent=p.id==="reg"?"Réglage +5 cm":p.name;stage.appendChild(t);tags[p.id]=t;});
+    inited=true;
+  }
+  const STEP=5; // cm de réglage avant changement de tube
+  function layout(){
+    // growth : 0..20 cm de croissance de la jambe
+    const g=Math.min(19.999,growth), pal=Math.min(3,Math.floor(g/STEP)), ext=g-pal*STEP;
+    const L=10+pal*5, fs=1+pal*.06, e=explode;
+    const f=groups.foot;f.scale.set(fs,fs,fs);f.position.set(0,-e*8,0);
+    const footTop=7.3*fs, t=groups.tube;
+    t.userData.tm.scale.y=L;t.userData.tm.position.y=L/2;t.userData.band.position.y=L*.32;t.userData.tc1.position.y=L-1.6;
+    const tubeBase=footTop-1.0;t.position.set(0,tubeBase,0.1);
+    const r=groups.reg, rb=tubeBase+L-0.2+e*8;r.position.set(0,rb,0.1);
+    r.userData.inner.scale.y=1+ext;r.userData.inner.position.y=3.9+(1+ext)/2-0.4;
+    const topY=3.9+(1+ext)-0.4;r.userData.top.position.y=topY;r.userData.pyr.position.y=topY+1.5;
+    const s=groups.socket;s.position.set(0,rb+topY+1.9+e*8+0.1,0.1);
+    const bottom=f.position.y, top2=s.position.y+17.4;root.position.y=-(bottom+top2)/2-1.2;
+    const H=top2-bottom, half=Math.tan(THREE.MathUtils.degToRad(16));
+    fitDist=Math.max(H*0.5*1.36/half,16*1.2/(half*Math.max(.4,camera.aspect)));
+    return {pal,ext,L};
+  }
+  let lastUI="";
+  function ui(st){
+    const key=st.pal+"|"+st.ext.toFixed(1);if(key===lastUI)return;lastUI=key;
+    $("#growthOut").textContent="+"+(st.pal*STEP+st.ext).toFixed(0)+" cm";
+    $("#mTube").textContent=st.L+" cm";
+    $("#mReg").textContent=st.ext.toFixed(1).replace(".",",")+" cm";
+    $("#mBack").textContent=String(st.pal);
+    $("#growMsg").innerHTML=st.pal===0&&st.ext<0.5?"La pièce de réglage s’allonge avec l’enfant. Le tube n’est changé que tous les <b>≈ 3 ans</b>, au lieu de chaque année."
+      :st.ext>4.6?"Réglage presque au maximum : au prochain rendez-vous, on passe au <b>tube suivant</b> et l’ancien repart vers un autre enfant."
+      :"Le réglage absorbe la croissance : <b>pas de nouvelle prothèse</b>"+(st.pal?", "+st.pal+" tube"+(st.pal>1?"s":"")+" déjà rendu"+(st.pal>1?"s":"")+" pour un autre enfant.":".");
+  }
+  function resize(){const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  function highlight(){
+    Object.entries(groups).forEach(([k,g])=>{const dim=sel&&sel!==k;g.traverse(o=>{if(o.isMesh){if(!o.userData.base)o.userData.base=o.material;o.material=dim?mats.ghost:o.userData.base;}});});
+    document.querySelectorAll(".part").forEach(b=>{const on=b.dataset.id===sel;b.setAttribute("aria-pressed",on);b.querySelector(".d").hidden=!on;});
+    Object.entries(tags).forEach(([k,t])=>t.style.opacity=(!sel||sel===k)?1:.25);
+  }
+  api.select=id=>{sel=id;if(inited)highlight();else document.querySelectorAll(".part").forEach(b=>{const on=b.dataset.id===sel;b.setAttribute("aria-pressed",on);b.querySelector(".d").hidden=!on;});};
+  const tmp=new THREE.Vector3();
+  function placeTags(){
+    const w=stage.clientWidth,h=stage.clientHeight,anchor={socket:[5.6,11],reg:[2.4,2.2],tube:[1.6,null],foot:[2.6,4.5]};
+    Object.entries(tags).forEach(([k,t])=>{
+      const g=groups[k];let [r,y]=anchor[k];if(k==="tube")y=g.userData.tm.scale.y*.62;
+      tmp.set(0,y,0);g.localToWorld(tmp);tmp.add(new THREE.Vector3(1,0,0).applyQuaternion(camera.quaternion).multiplyScalar(r*g.scale.x));tmp.project(camera);
+      t.style.left=((tmp.x*.5+.5)*w)+"px";t.style.top=((-tmp.y*.5+.5)*h)+"px";t.hidden=!(explode>0.15||k==="reg");
+    });
+  }
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function frame(){
+    requestAnimationFrame(frame);
+    explode+=(explodeTarget-explode)*0.12;
+    growth+=(growthTarget-growth)*0.15;
+    if(spin&&!dragging&&!reduce)rotY+=0.005;
+    const st=layout();
+    dist+=(fitDist*zf-dist)*0.15;
+    camera.position.set(Math.sin(rotY)*Math.cos(rotX)*dist,Math.sin(rotX)*dist+2,Math.cos(rotY)*Math.cos(rotX)*dist);camera.lookAt(0,0,0);
+    renderer.render(scene,camera);placeTags();ui(st);
+  }
+  const ray=new THREE.Raycaster(),m=new THREE.Vector2();
+  function pick(e){
+    const r=stage.getBoundingClientRect();m.x=((e.clientX-r.left)/r.width)*2-1;m.y=-((e.clientY-r.top)/r.height)*2+1;
+    ray.setFromCamera(m,camera);const hit=ray.intersectObjects(root.children,true)[0];
+    api.select(hit?(hit.object.userData.part===sel?null:hit.object.userData.part):null);
+  }
+  api.init=()=>{
+    if(typeof THREE==="undefined"){stage.insertAdjacentHTML("beforeend",'<div class="fallback">La vue 3D n’a pas pu se charger. Les quatre pièces sont décrites plus bas.</div>');return;}
+    try{build();}catch(e){stage.insertAdjacentHTML("beforeend",'<div class="fallback">La 3D n’est pas disponible sur cet appareil. Les quatre pièces sont décrites plus bas.</div>');return;}
+    new ResizeObserver(resize).observe(stage);resize();highlight();
+    stage.addEventListener("pointerdown",e=>{if(e.target.closest(".tools"))return;pointers.set(e.pointerId,[e.clientX,e.clientY]);stage.setPointerCapture(e.pointerId);
+      if(pointers.size===2){const [a,b]=[...pointers.values()];pinch=Math.hypot(a[0]-b[0],a[1]-b[1]);dragging=false;}else{dragging=true;moved=0;lastX=e.clientX;lastY=e.clientY;}});
+    stage.addEventListener("pointermove",e=>{if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,[e.clientX,e.clientY]);
+      if(pointers.size===2){const [a,b]=[...pointers.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch){zf=Math.max(.5,Math.min(1.7,zf*pinch/d));}pinch=d;moved=99;return;}
+      if(!dragging)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;moved+=Math.abs(dx)+Math.abs(dy);lastX=e.clientX;lastY=e.clientY;rotY-=dx*0.009;rotX=Math.max(-0.5,Math.min(0.9,rotX+dy*0.006));});
+    const up=e=>{pointers.delete(e.pointerId);if(pointers.size<2)pinch=0;if(dragging&&moved<6&&!e.target.closest(".tools"))pick(e);dragging=false;};
+    stage.addEventListener("pointerup",up);stage.addEventListener("pointercancel",e=>{pointers.delete(e.pointerId);dragging=false;});
+    stage.addEventListener("wheel",e=>{e.preventDefault();zf=Math.max(.5,Math.min(1.7,zf*(1+e.deltaY*0.001)));},{passive:false});
+    frame();
+  };
+  api.setExplode=v=>{explodeTarget=v;};
+  api.setGrowth=v=>{growthTarget=v;};
+  api.setSpin=v=>{spin=v;};
+  return api;
+})();
+let exploded=false;
+$("#explodeBtn").onclick=()=>{exploded=!exploded;P3.setExplode(exploded?1:0);$("#explodeBtn").textContent=exploded?"Rassembler":"Éclater";};
+const gIn=$("#growth");
+gIn.addEventListener("input",()=>P3.setGrowth(gIn.value/100));
+let anim=null;
+$("#growBtn").onclick=()=>{
+  if(anim){cancelAnimationFrame(anim);anim=null;$("#growBtn").textContent="Faire grandir";return;}
+  if(+gIn.value>=1990)gIn.value=0;
+  $("#growBtn").textContent="Pause";
+  const tick=()=>{gIn.value=Math.min(2000,+gIn.value+6);P3.setGrowth(gIn.value/100);if(+gIn.value<2000)anim=requestAnimationFrame(tick);else{anim=null;$("#growBtn").textContent="Recommencer";}};
+  anim=requestAnimationFrame(tick);
+};
+$("#spin").onclick=e=>{const on=e.currentTarget.getAttribute("aria-pressed")!=="true";e.currentTarget.setAttribute("aria-pressed",on);P3.setSpin(on);};
+P3.init();
+</script>
+</body>
+</html>
