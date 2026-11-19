@@ -272,7 +272,7 @@ function storyFrame(dt,now){
   ss.e+=(tE-ss.e)*Math.min(1,dt*7);ss.g+=(tG-ss.g)*Math.min(1,dt*7);ss.f+=(tF-ss.f)*Math.min(1,dt*7);
   const sel=(p>.33&&p<.48)?"reg":null;if(sel!==ss.sel){ss.sel=sel;S.M.ghost(sel);}
   const st=S.M.layout(ss.g,ss.e,ss.f);
-  S.draw(st,0.55+p*Math.PI*1.5+now*0.00006,0.1,1.18,dt,st.H*0.17);
+  const wide=S.cam.aspect>1;S.draw(st,0.55+p*Math.PI*1.5+now*0.00006,0.1,wide?1.4:1.18,dt,st.H*(wide?0.1:0.17));
   beats.forEach((b,i)=>{const a=+b.dataset.a,z=+b.dataset.b;const o=sm(a-.025,a+.02,p)*(1-sm(z-.02,z+.025,p));b.style.opacity=i===0?(1-sm(.11,.14,p)):o;b.style.transform="translateY("+((1-(i===0?1:sm(a-.025,a+.02,p)))*24)+"px)";});
   const k=p<.14?0:p<.32?1:p<.5?2:p<.8?3:4;dots.forEach((d,i)=>d.classList.toggle("on",i===k));
   $("#cue").style.opacity=p<.03?1:0;
