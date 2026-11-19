@@ -18,7 +18,7 @@ nav b{font-weight:600}nav span{color:var(--muted)}
 h1{margin:0;font-size:clamp(40px,9vw,72px);line-height:1.05;letter-spacing:-.03em;font-weight:700}
 .hero p.sub{margin:14px auto 0;max-width:560px;color:var(--muted);font-size:clamp(17px,2.6vw,21px);line-height:1.4}
 .wrap{max-width:980px;margin:0 auto;padding:0 20px}
-.stage{position:relative;background:var(--soft);border-radius:28px;overflow:hidden;height:min(68vh,640px);min-height:420px;touch-action:none}
+.stage{position:relative;background:var(--soft);border-radius:28px;overflow:hidden;height:min(68vh,640px);min-height:420px;touch-action:pan-y}
 .stage canvas{display:block;width:100%;height:100%}
 .tag3d{position:absolute;transform:translate(10px,-50%);font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;pointer-events:none;transition:opacity .4s}
 .tag3d.new{color:var(--accent)}
@@ -52,25 +52,38 @@ h2{margin:0 0 6px;font-size:clamp(30px,6vw,48px);letter-spacing:-.025em;line-hei
 .loop i{font-style:normal;color:var(--line)}
 .big{font-size:clamp(56px,14vw,96px);font-weight:700;letter-spacing:-.04em;text-align:center;line-height:1;margin:34px 0 6px;background:linear-gradient(90deg,#0071e3,#34aadc);-webkit-background-clip:text;background-clip:text;color:transparent}
 .cap{text-align:center;color:var(--muted);font-size:17px;margin:0}
+nav .in{align-items:center}
+.seg{display:flex;background:var(--soft);border-radius:980px;padding:3px}
+.seg button{all:unset;cursor:pointer;padding:6px 18px;border-radius:980px;font-weight:600;font-size:13px;color:var(--muted)}
+.seg button[aria-selected="true"]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.arbox{position:relative;background:var(--soft);border-radius:28px;height:min(62vh,600px);min-height:400px;overflow:hidden;display:grid;place-items:center}
+.arbox model-viewer{width:100%;height:100%;background:transparent}
+.arbtn{position:absolute;left:50%;bottom:22px;transform:translateX(-50%)}
+.arload{color:var(--muted);margin:0;padding:20px;text-align:center}
+.steps{display:grid;gap:12px;margin:28px 0 0}
+@media(min-width:760px){.steps{grid-template-columns:repeat(3,1fr)}}
+.steps div{background:var(--soft);border-radius:22px;padding:20px 22px}
+.steps b{display:block;color:var(--accent);font-size:13px;text-transform:uppercase;letter-spacing:.02em}
+.steps span{display:block;font-size:19px;font-weight:600;margin-top:4px}
 footer{max-width:980px;margin:80px auto 0;padding:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.5}
 </style>
 </head>
 <body>
-<nav><div class="in"><b>Proteor Junior</b><span>Groupe 51 · Arts et Métiers</span></div></nav>
+<nav><div class="in"><b>Proteor Junior</b><div class="seg" role="tablist"><button type="button" role="tab" id="tab3d" aria-selected="true">3D</button><button type="button" role="tab" id="tabAR" aria-selected="false">AR</button></div><span>Groupe 51</span></div></nav>
 
-<header class="hero">
+<header class="hero v3d">
   <p class="eyebrow">Prothèse pédiatrique modulaire</p>
   <h1>Elle grandit<br>avec lui.</h1>
   <p class="sub">Quand l’enfant grandit, on ne refait pas la prothèse. Une pièce s’allonge, et les autres servent ensuite à un autre enfant.</p>
 </header>
 
-<main class="wrap">
+<main class="wrap v3d">
   <div class="stage" id="stage" aria-label="Prothèse en 3D"></div>
   <div class="ctrls">
     <button class="btn" id="growBtn" type="button">Faire grandir</button>
     <button class="btn ghost" id="explodeBtn" type="button">Éclater</button>
   </div>
-  <p class="hint">Glissez pour tourner · pincez pour zoomer · touchez une pièce</p>
+  <p class="hint">Glissez sur le côté pour tourner · touchez une pièce</p>
 
   <div class="stats">
     <div><b id="mGrow">+0 cm</b><span>croissance</span></div>
@@ -95,6 +108,23 @@ footer{max-width:980px;margin:80px auto 0;padding:20px;border-top:1px solid var(
   </section>
 </main>
 
+<section id="arView" hidden>
+  <header class="hero">
+    <p class="eyebrow">Réalité augmentée</p>
+    <h1>Posez-la<br>chez vous.</h1>
+    <p class="sub">La prothèse apparaît à taille réelle, près de 50 cm, dans la pièce où vous êtes, grâce à la caméra du téléphone.</p>
+  </header>
+  <div class="wrap">
+    <div class="arbox" id="arBox"><p class="arload">Préparation du modèle 3D…</p></div>
+    <p class="msg" id="arMsg"></p>
+    <div class="steps">
+      <div><b>1</b><span>Touchez « Voir dans ma pièce »</span></div>
+      <div><b>2</b><span>Visez le sol avec la caméra</span></div>
+      <div><b>3</b><span>Tournez autour pour juger de la taille</span></div>
+    </div>
+  </div>
+</section>
+
 <footer>Projet collectif « Entreprise santé durable », tronc commun 3A, Arts et Métiers. Groupe 51 : Camille, Maxime, Oscar, Théophile. Modèle 3D simplifié, à visée illustrative. Durées et longueurs : hypothèses du groupe.</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -111,6 +141,9 @@ PARTS.forEach(p=>{const b=document.createElement("button");b.className="part";b.
   b.innerHTML='<small class="'+(p.nw?"new":"")+'">'+p.tag+'</small><strong>'+p.name+'</strong><span>'+p.d+'</span>';
   b.onclick=()=>{P3.select(P3.sel===p.id?null:p.id);$("#stage").scrollIntoView({behavior:"smooth",block:"center"});};
   $("#parts").appendChild(b);});
+
+const hap=(()=>{let l=null;try{l=document.createElement("label");l.style.display="none";const i=document.createElement("input");i.type="checkbox";i.setAttribute("switch","");l.appendChild(i);document.body.appendChild(l);}catch(e){}
+  return ms=>{try{if(navigator.vibrate)navigator.vibrate(ms||8);else if(l)l.click();}catch(e){}};})();
 
 const P3=(()=>{
   let inited=false,renderer,scene,camera,root,groups={},mats={},tags={};
@@ -206,7 +239,7 @@ const P3=(()=>{
   const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
   let tPrev=performance.now();
   function frame(now){
-    requestAnimationFrame(frame);const dt=Math.min(.05,(now-tPrev)/1000);tPrev=now;
+    requestAnimationFrame(frame);const dt=Math.min(.05,(now-tPrev)/1000);tPrev=now;if(!stage.offsetParent)return;
     explode+=(explodeTarget-explode)*Math.min(1,dt*4);
     growth+=(growthTarget-growth)*Math.min(1,dt*6);
     if(!dragging&&!reduce&&(idle+=dt)>1.5)rotY+=dt*0.25;
@@ -216,7 +249,8 @@ const P3=(()=>{
   }
   const ray=new THREE.Raycaster(),m=new THREE.Vector2();
   function pick(e){const r=stage.getBoundingClientRect();m.x=((e.clientX-r.left)/r.width)*2-1;m.y=-((e.clientY-r.top)/r.height)*2+1;
-    ray.setFromCamera(m,camera);const hit=ray.intersectObjects(root.children,true)[0];api.select(hit?(hit.object.userData.part===sel?null:hit.object.userData.part):null);}
+    ray.setFromCamera(m,camera);const hit=ray.intersectObjects(root.children,true)[0];api.select(hit?(hit.object.userData.part===sel?null:hit.object.userData.part):null);if(hit)hap(12);}
+  let lastDet=0;
   api.init=()=>{
     if(typeof THREE==="undefined"){stage.insertAdjacentHTML("beforeend",'<div class="fallback">La vue 3D n’a pas pu se charger.</div>');return;}
     try{build();}catch(e){stage.insertAdjacentHTML("beforeend",'<div class="fallback">La 3D n’est pas disponible sur cet appareil.</div>');return;}
@@ -225,17 +259,26 @@ const P3=(()=>{
       if(pointers.size===2){const [a,b]=[...pointers.values()];pinch=Math.hypot(a[0]-b[0],a[1]-b[1]);dragging=false;}else{dragging=true;moved=0;lastX=e.clientX;lastY=e.clientY;}});
     stage.addEventListener("pointermove",e=>{if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,[e.clientX,e.clientY]);idle=0;
       if(pointers.size===2){const [a,b]=[...pointers.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch)zf=Math.max(.5,Math.min(1.7,zf*pinch/d));pinch=d;moved=99;return;}
-      if(!dragging)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;moved+=Math.abs(dx)+Math.abs(dy);lastX=e.clientX;lastY=e.clientY;rotY-=dx*0.009;rotX=Math.max(-0.4,Math.min(0.8,rotX+dy*0.006));});
+      if(!dragging)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;moved+=Math.abs(dx)+Math.abs(dy);lastX=e.clientX;lastY=e.clientY;rotY-=dx*0.009;rotX=Math.max(-0.4,Math.min(0.8,rotX+dy*0.006));const det=Math.round(rotY/(Math.PI/6));if(det!==lastDet){lastDet=det;hap(5);}});
     const up=e=>{pointers.delete(e.pointerId);if(pointers.size<2)pinch=0;if(dragging&&moved<6)pick(e);dragging=false;};
     stage.addEventListener("pointerup",up);stage.addEventListener("pointercancel",e=>{pointers.delete(e.pointerId);dragging=false;});
-    stage.addEventListener("wheel",e=>{e.preventDefault();zf=Math.max(.5,Math.min(1.7,zf*(1+e.deltaY*0.001)));},{passive:false});
+    stage.addEventListener("wheel",e=>{if(!e.ctrlKey)return;e.preventDefault();zf=Math.max(.5,Math.min(1.7,zf*(1+e.deltaY*0.001)));},{passive:false});
     requestAnimationFrame(frame);
   };
   api.setExplode=v=>{explodeTarget=v;};api.setGrowth=v=>{growthTarget=v;};
+  api.exportGLB=()=>new Promise((ok,ko)=>{
+    if(!inited){ko(new Error("3D"));return;}
+    const se=explode,sg=growth,ss=sel;explode=0;growth=7;sel=null;highlight();layout();
+    const g=new THREE.Group(),c=root.clone(true);c.position.set(0,0,0);g.add(c);
+    explode=se;growth=sg;sel=ss;highlight();
+    g.scale.setScalar(0.01);g.updateMatrixWorld(true);
+    const b=new THREE.Box3().setFromObject(g);g.position.set(-(b.min.x+b.max.x)/2,-b.min.y,-(b.min.z+b.max.z)/2);
+    try{new THREE.GLTFExporter().parse(g,ok,{binary:true});}catch(e){ko(e);}
+  });
   return api;
 })();
 let exploded=false;
-function setExplode(v){exploded=v;P3.setExplode(v?1:0);$("#explodeBtn").textContent=v?"Rassembler":"Éclater";}
+function setExplode(v){if(v!==exploded)hap(14);exploded=v;P3.setExplode(v?1:0);$("#explodeBtn").textContent=v?"Rassembler":"Éclater";}
 $("#explodeBtn").onclick=()=>setExplode(!exploded);
 const gIn=$("#growth");
 gIn.addEventListener("input",()=>{stopGrow();P3.setGrowth(gIn.value/100);});
@@ -250,12 +293,34 @@ $("#growBtn").onclick=()=>{
   const tick=now=>{const dt=(now-last)/1000;last=now;
     if(pause>0){pause-=dt;}else{
       const before=+gIn.value,next=Math.min(2000,before+dt*100/0.9);
-      if(Math.floor(before/500)<Math.floor(next/500)&&next<2000){gIn.value=Math.floor(next/500)*500;pause=1.5;}else gIn.value=next;
+      if(Math.floor(before/500)<Math.floor(next/500)&&next<2000){gIn.value=Math.floor(next/500)*500;pause=1.5;hap(25);}else gIn.value=next;
       P3.setGrowth(gIn.value/100);}
     if(+gIn.value<2000)anim=requestAnimationFrame(tick);else{anim=null;$("#growBtn").textContent="Recommencer";}};
   anim=requestAnimationFrame(tick);
 };
 P3.init();
+function loadScript(src,mod){return new Promise((ok,ko)=>{const s=document.createElement("script");if(mod)s.type="module";s.src=src;s.onload=ok;s.onerror=ko;document.head.appendChild(s);});}
+let arReady=false;
+async function openAR(){
+  if(arReady)return;arReady=true;
+  try{
+    await loadScript("https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js");
+    const glb=await P3.exportGLB();
+    const url=URL.createObjectURL(new Blob([glb],{type:"model/gltf-binary"}));
+    await loadScript("https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js",true);
+    await customElements.whenDefined("model-viewer");
+    const mv=document.createElement("model-viewer");
+    [["src",url],["alt","Prothèse Proteor Junior à taille réelle"],["ar",""],["ar-modes","webxr quick-look"],["ar-scale","fixed"],["camera-controls",""],["auto-rotate",""],["shadow-intensity","1"],["touch-action","pan-y"],["camera-orbit","30deg 75deg auto"],["exposure","0.85"],["environment-image","neutral"]].forEach(([k,v])=>mv.setAttribute(k,v));
+    mv.innerHTML='<button slot="ar-button" class="btn arbtn" type="button">Voir dans ma pièce</button>';
+    $("#arBox").innerHTML="";$("#arBox").appendChild(mv);
+    mv.addEventListener("load",()=>{$("#arMsg").innerHTML=mv.canActivateAR?"Touchez <b>Voir dans ma pièce</b>, visez le sol, puis posez la prothèse.":"Pour la réalité augmentée, ouvrez cette page sur un <b>iPhone</b> ou un <b>Android récent</b>.";});
+    mv.addEventListener("ar-status",e=>{if(e.detail.status==="object-placed")hap(20);});
+  }catch(e){arReady=false;$("#arBox").innerHTML='<p class="arload">Le modèle n’a pas pu se charger. Vérifiez la connexion et réessayez.</p>';}
+}
+function showTab(ar){$("#tab3d").setAttribute("aria-selected",!ar);$("#tabAR").setAttribute("aria-selected",ar);document.querySelectorAll(".v3d").forEach(e=>e.hidden=ar);$("#arView").hidden=!ar;window.scrollTo(0,0);if(ar){stopGrow();openAR();}}
+$("#tab3d").onclick=()=>{hap(8);history.replaceState(null,"",location.pathname);showTab(false);};
+$("#tabAR").onclick=()=>{hap(8);history.replaceState(null,"","#ar");showTab(true);};
+if(location.hash==="#ar")showTab(true);
 </script>
 </body>
 </html>
